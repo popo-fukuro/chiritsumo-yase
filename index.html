@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ちりも積もれば痩せとなる</title>
+<meta name="description" content="毎日3つの小さなミッションから1つ選んでやるだけ。3日坊主を卒業して、まず7日続けるためのアプリ。登録・インストール不要。">
+<meta name="theme-color" content="#f4f3ef" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111110" media="(prefers-color-scheme: dark)">
+<!-- ホーム画面に追加したときの表示 -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ちりつも">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<!-- SNS で共有されたときの表示 -->
+<meta property="og:title" content="ちりも積もれば痩せとなる">
+<meta property="og:description" content="毎日3つの小さなミッションから1つ選んでやるだけ。3日坊主を卒業して、まず7日続けるためのアプリ。">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <!-- ================= ホーム ================= -->
+  <section class="view" id="view-home" aria-labelledby="homeTitle">
+    <header class="top">
+      <h1 id="homeTitle">ちりも積もれば<br class="sp">痩せとなる</h1>
+      <span class="date" id="homeDate"></span>
+    </header>
+
+    <div class="card stats" id="stats">
+      <div class="stat">
+        <div class="stat-label">連続</div>
+        <div class="stat-num"><span id="streakNum">0</span><small>日</small></div>
+        <div class="stat-sub" id="streakSub"></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">合計</div>
+        <div class="stat-num"><span id="totalNum">0</span><small>日</small></div>
+        <div class="stat-sub">へらないよ</div>
+      </div>
+      <div class="mountain-wrap">
+        <svg id="mountain" class="mountain" role="img" aria-label="積もったちり"></svg>
+      </div>
+      <div class="milestone" id="milestone"></div>
+    </div>
+
+    <div class="card mission-card" id="missionCard" aria-live="polite"></div>
+
+    <div class="card weight-card" id="weightCard">
+      <form class="entry" id="weightForm" autocomplete="off" novalidate>
+        <div class="field">
+          <label for="weight" id="weightLabel">体重（任意・スキップOK）</label>
+          <div class="weight-wrap">
+            <input id="weight" name="weight" type="text" inputmode="decimal" enterkeyhint="done" placeholder="00.0" aria-describedby="weightErr weightHint">
+            <span class="unit">kg</span>
+          </div>
+        </div>
+        <button class="btn-save" type="button" id="weightSave">記録</button>
+      </form>
+      <div class="sub-row" id="weightHint"></div>
+      <div class="error" id="weightErr" role="alert"></div>
+    </div>
+  </section>
+
+  <!-- ================= 履歴 ================= -->
+  <section class="view" id="view-history" aria-labelledby="historyTitle" hidden>
+    <header class="top">
+      <h1 id="historyTitle">きろく</h1>
+    </header>
+
+    <div class="card hist-stats">
+      <div><span class="hs-label">連続</span><b id="hStreak">0</b>日</div>
+      <div><span class="hs-label">合計</span><b id="hTotal">0</b>日</div>
+      <div><span class="hs-label">いちばん長い連続</span><b id="hBest">0</b>日</div>
+    </div>
+
+    <div class="card">
+      <div class="cal-head">
+        <button class="icon-btn" type="button" id="calPrev" aria-label="前の月">‹</button>
+        <h2 id="calTitle"></h2>
+        <button class="icon-btn" type="button" id="calNext" aria-label="次の月">›</button>
+      </div>
+      <div class="cal" id="cal" role="grid" aria-labelledby="calTitle"></div>
+      <div class="cal-legend"><span class="lg-done"></span>できた日　<span class="lg-today"></span>今日</div>
+      <div class="cal-detail" id="calDetail" aria-live="polite"></div>
+    </div>
+
+    <div class="card" aria-labelledby="chartTitle">
+      <div class="chart-top">
+        <h2 id="chartTitle">体重（直近14日）</h2>
+        <div class="trend" id="trend" hidden></div>
+      </div>
+      <div class="chart" id="chart">
+        <svg id="svg" role="img" aria-label="直近14日の体重の折れ線グラフ"></svg>
+        <div class="tooltip" id="tooltip"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 設定 ================= -->
+  <section class="view" id="view-settings" aria-labelledby="settingsTitle" hidden>
+    <header class="top">
+      <h1 id="settingsTitle">せってい</h1>
+    </header>
+
+    <div class="card">
+      <h2>ミッションのカテゴリ</h2>
+      <p class="muted">オフにしたカテゴリは出てこなくなります（1つは残してください）。まだミッションを選んでいなければ、今日の分から変わります。</p>
+      <div id="catToggles"></div>
+      <div class="error" id="catErr" role="alert"></div>
+    </div>
+
+    <div class="card">
+      <h2>データ</h2>
+      <p class="muted">記録はこの端末（ブラウザ）の中だけに保存されていて、どこにも送信していません。ブラウザのデータを消したり、別の端末で開いたりすると記録は引き継がれません。</p>
+      <button class="btn-danger" type="button" id="deleteAll">すべての記録を削除する</button>
+    </div>
+
+    <div class="card">
+      <h2>このアプリについて</h2>
+      <p class="muted">「痩せるアプリ」ではなく「3日坊主を卒業するアプリ」です。最初のゴールは、7日続けること。</p>
+      <p class="muted">体重の記録と習慣づくりのための道具で、医療・ダイエットの助言をするものではありません。体調や減量のことは、医師などの専門家にご相談ください。</p>
+      <p class="muted">共用の端末で使うと、記録が他の人にも見えます。</p>
+    </div>
+  </section>
+</main>
+
+<nav class="tabs" aria-label="画面の切りかえ">
+  <a href="#home" data-view="home"><span aria-hidden="true">🏠</span>ホーム</a>
+  <a href="#history" data-view="history"><span aria-hidden="true">📅</span>きろく</a>
+  <a href="#settings" data-view="settings"><span aria-hidden="true">⚙️</span>せってい</a>
+</nav>
+
+<div class="celebrate" id="celebrate" hidden role="dialog" aria-modal="true" aria-labelledby="celebTitle">
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+  <div class="celeb-box">
+    <div class="celeb-big" id="celebBig"></div>
+    <h2 id="celebTitle"></h2>
+    <p id="celebText"></p>
+    <button class="btn-primary" type="button" id="celebClose">うれしい！</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="missions.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
